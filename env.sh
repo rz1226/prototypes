@@ -1,0 +1,4 @@
+export MYSQL_HOST=127.0.0.1
+export MYSQL_PORT=3306
+export MYSQL_USERNAME=root
+export MYSQL_PASSWORD=Newlife123!
