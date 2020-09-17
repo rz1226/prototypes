@@ -28,8 +28,21 @@ func test_check_insert() {
 	}
 }
 
+func test_batch_insert(){
+	for i := 0; i < 10000; i++ {
+		data := rangetable.DataForInsert{}
+		data.Name = fmt.Sprint("name_",i )
+		rangetable.Put(data)
+
+	}
+
+
+	time.Sleep(time.Second*5)
+}
+
 func main() {
-
-	test_check_insert()
-
+	for i := 0; i < 100; i++ {
+		err := rangetable.Update("example_insert", fmt.Sprint("id = ",i),  map[string]interface{}{"status":1042})
+		fmt.Println(err )
+	}
 }
