@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/rz1226/prototypes/filesread/files"
+	"time"
 )
 
 func test_make_some_test_files() {
@@ -22,6 +23,14 @@ func test_get_all_files() {
 	}
 }
 
+func test_write() {
+	for i := 0; i < 100; i++ {
+		files.Write(i, "\n")
+	}
+	files.CloseWrite()
+	time.Sleep(time.Second * 3)
+}
+
 func main() {
-	test_get_all_files()
+	test_write()
 }
