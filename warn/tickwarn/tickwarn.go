@@ -10,6 +10,8 @@ import (
 warn := NewTickWarn(300，100 ) //五分钟没有tick，则报警，报警频率最高100秒一次
 
 */
+const STATUS_TICK = 1
+const STATUS_WARN = 2
 
 type TickWarn struct {
 	MinTickDuration int64 //事件低于这个频率就报警  单位秒
@@ -34,7 +36,7 @@ func NewTickWarn(minTickDuration, minWarnDuration int64, warnFunc func(), recove
 
 	t.WarnFunc = warnFunc
 	t.RecoverFunc = recoverFunc
-	t.LastAction = 1
+	t.LastAction = STATUS_TICK
 	t.run()
 	return t
 }
@@ -42,12 +44,12 @@ func NewTickWarn(minTickDuration, minWarnDuration int64, warnFunc func(), recove
 func (t *TickWarn) Tick() {
 	fmt.Println("tick", time.Now().Format("2006-01-02 15:04:05"))
 	t.LastTimeTick = time.Now().Unix()
-	if t.LastAction == 2 {
+	if t.LastAction == STATUS_WARN {
 		//recover warn
 		t.RecoverFunc()
 	}
 
-	t.LastAction = 1
+	t.LastAction = STATUS_TICK
 
 
 }
@@ -63,7 +65,7 @@ func (t *TickWarn) warn() bool {
 
 	t.WarnFunc()
 	t.LastTimeWarn = now
-	t.LastAction = 2
+	t.LastAction = STATUS_WARN
 	return true
 
 }
