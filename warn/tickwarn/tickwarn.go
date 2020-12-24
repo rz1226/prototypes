@@ -19,16 +19,22 @@ type TickWarn struct {
 	LastTimeWarn int64 //最后一次报警时间 时间戳
 
 	WarnFunc func() //报警函数，报警的时候会触发它
+	RecoverFunc func() //报警状态下，发生第一次tick的时候，做这个动作
+
+	LastAction  int64  //最后一次动作，1代表tick 2代表warn
+
 }
 
-func NewTickWarn(minTickDuration, minWarnDuration int64, f func()) *TickWarn {
+func NewTickWarn(minTickDuration, minWarnDuration int64, warnFunc func(), recoverFunc func()  ) *TickWarn {
 	t := &TickWarn{}
 	t.MinTickDuration = minTickDuration
 	t.MinWarnDuration = minWarnDuration
 	//初始值防止一启动就误报
 	t.LastTimeWarn = time.Now().Unix()
 
-	t.WarnFunc = f
+	t.WarnFunc = warnFunc
+	t.RecoverFunc = recoverFunc
+	t.LastAction = 1
 	t.run()
 	return t
 }
@@ -36,6 +42,13 @@ func NewTickWarn(minTickDuration, minWarnDuration int64, f func()) *TickWarn {
 func (t *TickWarn) Tick() {
 	fmt.Println("tick", time.Now().Format("2006-01-02 15:04:05"))
 	t.LastTimeTick = time.Now().Unix()
+	if t.LastAction == 2 {
+		//recover warn
+		t.RecoverFunc()
+	}
+
+	t.LastAction = 1
+
 
 }
 
@@ -50,6 +63,7 @@ func (t *TickWarn) warn() bool {
 
 	t.WarnFunc()
 	t.LastTimeWarn = now
+	t.LastAction = 2
 	return true
 
 }
